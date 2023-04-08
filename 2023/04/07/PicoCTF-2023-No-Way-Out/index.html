@@ -17,7 +17,7 @@
 <meta property="og:image" content="https://b3at1.github.io/media/PicoCTF-2023/picoGame2023(1).gif">
 <meta property="og:image" content="https://b3at1.github.io/media/PicoCTF-2023/Game2.PNG">
 <meta property="article:published_time" content="2023-04-07T19:34:17.000Z">
-<meta property="article:modified_time" content="2023-04-07T22:10:15.427Z">
+<meta property="article:modified_time" content="2023-04-08T17:10:48.822Z">
 <meta property="article:author" content="Sam Bederman">
 <meta property="article:tag" content="rev">
 <meta property="article:tag" content="writeup">
@@ -150,7 +150,8 @@
 <figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">OnTriggerEnter</span>(<span class="params">Collider collision</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (collision.gameObject == <span class="keyword">this</span>.player)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">this</span>.Mysterious.SetActive(<span class="literal">true</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>This looks pretty suspicious, so lets see if we can find a way to trigger the event without a collision.<br>We can do that by creating a new method in our class as such:</p>
 <figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Start</span>()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">this</span>.Mysterious.SetActive(<span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Perfect! Now starting the game, the Class will immediatly call whatever is supposed to happen when the player collides with the object.<br><img src="/media/PicoCTF-2023/Game2.PNG" alt="Game Winscreen"  width=auto height=auto></p>
+<p>Perfect! Now starting the game, the class will immediately call whatever is supposed to happen when the player collides with the object.<br><img src="/media/PicoCTF-2023/Game2.PNG" alt="Game Winscreen"  width=auto height=auto></p>
+<p>PicoCTF was pretty fun this year. It was my second year doing it, and I enjoyed playing solo. Overall a great CTF, and I hope to get more pwn done next year, as I didn’t really touch that category. Big thanks to CMU and the PicoCTF organizers!<br><br></p>
 
   </div>
 </article>
