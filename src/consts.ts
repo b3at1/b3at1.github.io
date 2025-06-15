@@ -3,8 +3,8 @@ import type { IconMap, SocialLink, Site } from '@/types'
 export const SITE: Site = {
   title: 'b3at\'s blog',
   description:
-    'AAAAAAAAAAAAAAAAAA',
-  href: 'https://astro-erudite.vercel.app',
+    'I\'m just a guy who does stuff',
+  href: 'https://b3at1.github.io',
   author: 'b3at',
   locale: 'en-US',
   featuredPostCount: 2,
