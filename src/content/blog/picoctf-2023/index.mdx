@@ -1,0 +1,91 @@
+---
+title: 'PicoCTF 2023 - No Way Out'
+description: 'PicoCTF 2023 Writeup'
+date: 2023-04-07
+tags: ['writeup', 'rev']
+---
+
+## Problem Description
+```Put this flag in standard picoCTF format before submitting. If the flag was h1_1m_7h3_f14g submit picoCTF{h1_1m_7h3_f14g} to the platform.```
+
+Disclaimer: since this is a picoCTF challenge, you can still do it in [picoGym](https://play.picoctf.org/practice/challenge/361)
+Spoilers Ahead! *(Duh)*
+
+## Solution
+We are given a game to play, in this case an .exe as I am on Windows. When we run it, we are greeted with the "Made with Unity" screen, before we see our character placed in a sandbox with a white flag outside of the walls.
+![game](game.png)
+My first instinct was of course to climb the ladder and jump off the platform, in order to get to the white flag. However, we quickly see that this doesn't work as there is an invisible wall that we can't jump over *(or at least not yet.)*
+
+From here, the actual challenge begins. Luckily, since this is a Unity game and it was compiled with Mono instead of IL2CPP, it should be pretty easy to reverse.
+
+The key thing to be familiar with is the [Unity game folder structure](https://github.com/imadr/Unity-game-hacking#unity-game-folder-structure) in a nutshell, all we care about is `Assembly-CSharp.dll`, which we can find at `{game}_data/Managed/Assembly-CSharp.dll` This file will contain all the C# functions that we want to modify to change the way the game plays.
+
+For this writeup, I'll be using dnSpy to modify the dll. The first thing I did was open my `Assembly-CSharp.dll` in dnSpy, which revealed a `PlayerController`. Taking a look around, we see the `Start()` method:
+
+``` C#
+private void Start()
+	{
+		this.characterController = base.GetComponent<CharacterController>();
+		if (this.Items == null && base.GetComponent<ItemChange>())
+		{
+			this.Items = base.GetComponent<ItemChange>();
+		}
+		this.cam = base.GetComponentInChildren<Camera>();
+		Cursor.lockState = CursorLockMode.Locked;
+		Cursor.visible = false;
+		this.InstallCroughHeight = this.characterController.height;
+		this.InstallCameraMovement = this.Camera.localPosition;
+		this.InstallFOV = this.cam.fieldOfView;
+		this.RunningValue = this.RuningSpeed;
+		this.installGravity = this.gravity;
+		this.WalkingValue = this.walkingSpeed;
+	}
+```
+Looking at the code, my first instinct was to change some values so I can run faster, and perhaps jump higher to get over the invisible wall.
+I did this by changing a few lines so I would start with a faster speed, and my jumps would be more powerful:
+
+
+``` C#
+this.WalkingValue = this.walkingSpeed * 5f;
+this.RunningValue = this.RuningSpeed * 5f;
+```
+
+and in the `Update()` method:
+
+``` C#
+if (Input.GetButton("Jump") && this.canMove && this.characterController.isGrounded && !this.isClimbing)
+{
+	this.moveDirection.y = this.jumpSpeed * 5f;
+}
+```
+Now, lets hit Ctrl+Shift+S to save all our changes made to the dll in dnSpy.
+Lets try playing the game (sorry for the bad GIF quality):
+![gameplay GIF](picoGame2023.gif)
+As you can see we have found the flag `picoCTF{WELCOME_TO_UNITY!!}`
+
+One thing to consider is that this solution only worked as the invisible walls didn't go that high and there was no ceiling to block us in. In the case that we were blocked in, this wouldn't have worked.
+
+Luckily, there's a second way we could have patched the game as shown by [CryptoCat](https://youtu.be/QgF4PQjeG-o?t=445).
+
+Taking a look at the APTX() class, we see this method:
+``` C#
+	private void OnTriggerEnter(Collider collision)
+	{
+		if (collision.gameObject == this.player)
+		{
+			this.Mysterious.SetActive(true);
+		}
+	}
+```
+This looks pretty suspicious, so lets see if we can find a way to trigger the event without a collision.
+We can do that by creating a new method in our class as such:
+``` C#
+	private void Start()
+	{
+		this.Mysterious.SetActive(true);
+	}
+```
+Perfect! Now starting the game, the class will immediately call whatever is supposed to happen when the player collides with the object.
+![game](game2.png)
+
+PicoCTF was pretty fun this year. It was my second year doing it, and I enjoyed playing solo. Overall a great CTF, and I hope to get more pwn done next year, as I didn't really touch that category. Big thanks to CMU and the PicoCTF organizers!

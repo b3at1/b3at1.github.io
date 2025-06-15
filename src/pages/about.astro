@@ -1,0 +1,37 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import Link from '@/components/Link.astro'
+import PageHead from '@/components/PageHead.astro'
+import ProjectCard from '@/components/ProjectCard.astro'
+import Layout from '@/layouts/Layout.astro'
+import { getAllProjects } from '@/lib/data-utils'
+
+const projects = await getAllProjects()
+---
+
+<Layout class="max-w-3xl">
+  <PageHead slot="head" title="About" />
+  <Breadcrumbs items={[{ label: 'About', icon: 'lucide:info' }]} />
+
+  <section>
+    <div class="min-w-full">
+      <div class="prose mb-8">
+      <h1>Howdy! 🤠</h1>
+        <p class="mt-0">
+          I'm Sam Bederman, a Computer Science student @  <Link
+            href="https://cybr.club"
+            external
+            underline>TAMU</Link
+          >. I spend my free time learning about security, participating in CTFs, developing projects, and working out. I also like to hike, create music, and play pool and pinball.
+        </p>
+        <p>
+          Feel free to reach out to me if you wanna say hi.
+        </p>
+      </div>
+    <!--  <h2 class="mb-4 text-2xl font-medium">Example Projects Listing</h2> -->
+    <!--  <div class="flex flex-col gap-4">                                   -->
+    <!--    {projects.map((project) => <ProjectCard project={project} />)}    -->
+    <!--  </div>                                                              -->
+    </div>
+  </section>
+</Layout>
