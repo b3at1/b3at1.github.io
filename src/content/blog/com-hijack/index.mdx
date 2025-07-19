@@ -6,18 +6,18 @@ tags: ['maldev']
 ---
 # COM Hijacking - Part 1
 ## Introduction
-Recently I have started learning malware development, and having had the fortune (or possibly misfortune) of already using Win32 for some of my school work, I became curious about how some malicious techniques exploit benign Windows features. One that caught my eye was COM hijacking. This post serves as an example of a COM hijack, as well as some information about the technique.
+Recently I started learning malware development, and having had the fortune (or possibly misfortune) of already using Win32 for some of my school work, I became curious about how some malicious techniques exploit benign Windows features. One that caught my eye was COM hijacking. This post serves as an example of a COM hijack, as well as some information about the technique.
 
-When I first heard about COM hijacking, I was curious as I noticed it wasn’t covered in [Maldev Academy](https://maldevacademy.com), and the name of the technique begged the question: 
+When I first heard about COM hijacking, I was curious as I noticed it wasn’t covered in [Maldev Academy](https://maldevacademy.com), and the name of the technique raised the question: 
 
 ## What the Heck is a COM?
-TBH, I’m still not fully sure, and it’s not that relevant to the task at hand. As a quick definition, COM stands for Component Object Model, and is a set of processes that define how an object can be interfaced with (created, destroyed, managed, etc.) The primary case for COM is language interoperability and binary compatibility, it's essentially just a set of interfaces that objects can use for greater compatibility.
+Admittedly, I’m still not fully sure, and it’s not that relevant to the task at hand. As a quick definition, COM stands for Component Object Model, and is a set of processes that define how an object can be interfaced with (created, destroyed, managed, etc.). The primary case for COM is cross-process interoperability, it's essentially just a set of interfaces that objects can use for greater compatibility.
 
 ## How Does COM Hijacking Work?
-The goal of this post is to demonstrate an example COM hijack, not to give an in depth explanation of how or why it works, so I recommend checking out other resources for a more detailed explanation, especially the ones I have linked as references. At a high level, COM hijacking works by identifying a missing component and replacing it with your own malicious one. The methodology used in this post is identifying a CLSID missing from the HKCU hive, and creating it with a malicious DLL. The malicious DLL must use DLL proxying, otherwise the functionality of the application will likely be destroyed upon loading the DLL. Naturally, there are many different ways to accomplish this, and the methodology below is just one such way.
+The goal of this post is to demonstrate an example COM hijack, not to give an in-depth explanation of how or why it works, so I recommend checking out other resources for a more detailed explanation, especially the ones I have linked as references. At a high level, COM hijacking works by identifying a component absent in HKCU (or overriding an existing one) and replacing it with your own malicious component. The methodology used in this post is identifying a CLSID missing from the HKCU hive, and creating it with a malicious DLL. The malicious DLL must use DLL proxying, otherwise the functionality of the application will likely be destroyed upon loading the DLL. Naturally, there are many different ways to accomplish this, and the methodology below is just one such way.
 
 ## Step 1: Identify a Target Object
-First we need to identify the COM Object to Hijack, using procmon the following filters can be applied:
+First we need to identify the COM Object to Hijack. Using procmon, the following filters can be applied:
 
 | Filter Component                      | Purpose                                                       |
 |---------------------------------------|---------------------------------------------------------------|
@@ -32,7 +32,7 @@ We can further inspect it by viewing its HKLM key.
 ![clsid_reg.png](clsid_reg.png)
 Upon [further research](https://hijacklibs.net/entries/microsoft/built-in/dataexchange.html) this seems like a good candidate.
 ## Step 2: Develop the DLL
-This step isn’t very relevant to the technique, but since I am still relatively new to maldev, I wanted to share it regardless. For our purposes we will just be spawning a calc process.
+While DLL development isn't unique to COM hijacking, it's an essential part of this example. For our purposes we will just be spawning a calc process.
 
 Here’s the code I came up with:
 ```cpp
@@ -122,6 +122,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 }
 ```
 A few notes:
+* THIS CODE IS NOT PERFECT. For instance, spawning a thread in DllMain isn't best practice, if chrome crashes the mutex might leak. This can be mitigated using SEH or a global flag.
 * To ensure that calc only opens once, a global mutex is used. Originally I tried making a snapshot instead, but since chrome can spawn a lot of processes at/near the same time, they would cancel each other out and none would spawn calc.
 * Also, it’s important to be careful about which process you are injecting. In this case I make sure that only `chrome.exe` runs our payload. I learned this the hard way by accidentally injecting `explorer.exe` and having my dll persist whenever the process restarted. Luckily I always snapshot my VM so I just reset it.
 * There are many other stealthier / more advanced ways to dll inject than DLL_PROCESS_ATTACH, but for our purposes the standard DLL injection is used
@@ -143,7 +144,7 @@ We’re pretty much ready to go! Now we just need to add the registry key corres
 Upon launching chrome, we can see the calculator spawn:
 <video src="/static/videos/com_hijack_poc.mp4" controls autoplay muted width="100%" />
 
-To further ensure our DLL was loaded (even though there’s really no reason to do so in this case) process explorer or resource monitor can be used to investigate the DLLs that chrome.exe has loaded.![procexp_dllhijack.png](./procexp_dllhijack.png)
+To further ensure our DLL was loaded process explorer or resource monitor can be used to investigate the DLLs that chrome.exe has loaded.![procexp_dllhijack.png](./procexp_dllhijack.png)
 From here, a crafty attacker could use the execution within chrome to exfil browser data, hide c2 traffic, install malicious extensions, etc. For now we’ll stop here though.
 
 ## Cleanup:
