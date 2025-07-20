@@ -141,7 +141,7 @@ We’re pretty much ready to go! Now we just need to add the registry key corres
 `
 
 Upon launching chrome, we can see the calculator spawn:
-<video src="/static/videos/com_hijack_poc.mp4" controls autoplay muted width="100%" />
+<video src="/static/videos/com_hijack_poc.mp4" controls muted width="100%" />
 
 To further ensure our DLL was loaded process explorer or resource monitor can be used to investigate the DLLs that chrome.exe has loaded.![procexp_dllhijack.png](./procexp_dllhijack.png)
 From here, a crafty attacker could use the execution within chrome to exfil browser data, hide c2 traffic, install malicious extensions, etc. For now we’ll stop here though.
