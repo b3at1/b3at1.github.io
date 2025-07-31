@@ -5,7 +5,7 @@ date: 2025-07-27
 tags: ['maldev']
 ---
 ## Introduction
-In part 1, we demonstrated a basic COM hijack by targeting a missing CLSID under `InProcServer32` to register a malicious DLL in the HKCU hive. The malicious DLL was created to spawn `calc.exe` in the `chrome.exe` process, while using DLL proxying to maintain functionality. In part 2, we will go over some alternatives to `InProcServer32` for stealthier hijacking, and potential detections and mitigations for [this technique](https://attack.mitre.org/techniques/T1546/015/). _Please note that this is not a comprehensive list, not all COM hijacking techniques will be covered!_
+In [part 1](https://b3at1.github.io/blog/com-hijack-pt1/), we demonstrated a basic COM hijack by targeting a missing CLSID under [InProcServer32](https://learn.microsoft.com/en-us/windows/win32/com/inprocserver32) to register a malicious DLL in the HKCU hive. The malicious DLL was created to spawn `calc.exe` in the `chrome.exe` process, while using DLL proxying to maintain functionality. In part 2, we will go over some alternatives to `InProcServer32` for stealthier hijacking, and potential detections and mitigations for [this technique](https://attack.mitre.org/techniques/T1546/015/). _Please note that this is not a comprehensive list, not all COM hijacking techniques will be covered!_
 
 ## Choosing a Target
 This step was shown in Part 1 where we learned how to COM Hijack `InProcServer32`. This time around I chose `ondrive.exe` as my target. Just like last time, I was able to use InProcServer32 to hijack the `mlang.dll` COM Object in the HKCU hive to spawn calc. I won’t go over how I did this as it’s already covered in my previous article. Now let’s explore other methods to hijack the process:
