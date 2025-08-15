@@ -7,7 +7,7 @@ export const SITE: Site = {
   href: 'https://b3at1.github.io',
   author: 'b3at',
   locale: 'en-US',
-  featuredPostCount: 2,
+  featuredPostCount: 3,
   postsPerPage: 4,
 }
 
