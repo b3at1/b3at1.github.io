@@ -13,6 +13,11 @@ const { links } = Astro.props
 ---
 
 <ul class="flex flex-wrap gap-2" role="list">
+  <li>
+    <a href="https://biggulpsupreme.neocities.org/" target="_blank" class="duration-300 ease-in-out inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-1 overflow-hidden" aria-label="Neocities" title="Neocities">
+      <img src="https://i.imgur.com/ZU3CcjO.gif" class="h-7 w-auto" alt="Neocities">
+    </a>
+  </li>
   {
     links.map(({ href, label }) => (
       <li>
